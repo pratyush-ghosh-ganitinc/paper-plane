@@ -115,6 +115,31 @@
   min-width: 60px;
 }
 
+.hoops-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hoops-label {
+  color: #FFD700;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.hoops-value {
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 16px;
+  min-width: 30px;
+}
+
 .game-config {
   background: rgba(0, 0, 0, 0.7);
   padding: 20px;
@@ -337,8 +362,79 @@
   font-family: 'Courier New', monospace;
 }
 
+.final-hoops {
+  margin: 0 0 30px 0;
+  font-size: 18px;
+  color: #FFD700;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
 .game-over-panel .control-button {
   margin: 0 auto;
   padding: 15px 30px;
   font-size: 18px;
+}
+
+/* Hoop Bonus Notification */
+.hoop-bonus-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1500;
+  pointer-events: none;
+  animation: hoopBonusAnimation 2s ease-out;
+}
+
+.hoop-bonus-content {
+  background: rgba(255, 215, 0, 0.9);
+  color: #000;
+  padding: 20px 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+  border: 3px solid #FFD700;
+  backdrop-filter: blur(10px);
+}
+
+.hoop-bonus-icon {
+  display: block;
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.hoop-bonus-text {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.hoop-bonus-points {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #2E7D32;
+  font-family: 'Courier New', monospace;
+}
+
+@keyframes hoopBonusAnimation {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
 }

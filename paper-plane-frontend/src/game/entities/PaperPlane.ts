@@ -91,14 +91,14 @@ export class PaperPlane {
 
   public updateRotation(deltaX: number, deltaY: number): void {
     // Update target rotation based on mouse input
-    this.targetRotation.y += deltaX; // Yaw (left/right)
+    this.targetRotation.y -= deltaX; // Yaw (left/right) - inverted so right mouse = right turn
     this.targetRotation.x += deltaY; // Pitch (up/down)
     
     // Clamp pitch to prevent over-rotation
     this.targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, this.targetRotation.x));
     
     // Add banking effect based on turn rate
-    this.targetRotation.z = -deltaX * 2; // Bank in the direction of turn
+    this.targetRotation.z = deltaX * 2; // Bank in the direction of turn - also inverted
     this.targetRotation.z = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, this.targetRotation.z));
   }
 

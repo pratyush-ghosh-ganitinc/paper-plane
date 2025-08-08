@@ -15,6 +15,8 @@ export interface GameState {
   isRunning: boolean;
   isGameOver: boolean;
   score: number;
+  hoopsPassed: number;
+  lastHoopBonus: number;
   collisionMessage?: string;
 }
 
@@ -43,7 +45,9 @@ export class GameEngine {
     this.gameState = {
       isRunning: false,
       isGameOver: false,
-      score: 0
+      score: 0,
+      hoopsPassed: 0,
+      lastHoopBonus: 0
     };
     
     // Initialize Three.js core components
@@ -108,6 +112,8 @@ export class GameEngine {
     this.gameState.isRunning = true;
     this.gameState.isGameOver = false;
     this.gameState.score = 0;
+    this.gameState.hoopsPassed = 0;
+    this.gameState.lastHoopBonus = 0;
     this.clock.start();
     this.animate();
   }
@@ -123,6 +129,8 @@ export class GameEngine {
   public restart(): void {
     this.gameState.isGameOver = false;
     this.gameState.score = 0;
+    this.gameState.hoopsPassed = 0;
+    this.gameState.lastHoopBonus = 0;
     this.gameState.collisionMessage = undefined;
     
     // Reset plane position
@@ -190,7 +198,11 @@ export class GameEngine {
         // For rings, check if we're inside the ring
         const ringDistance = planePosition.distanceTo(obstaclePosition);
         if (ringDistance < 8 && ringDistance > 6) {
-          // Inside the ring - no collision, maybe bonus points
+          // Inside the ring - award bonus points if not already passed
+          if (!obstacle.userData.passed) {
+            obstacle.userData.passed = true;
+            this.awardHoopBonus();
+          }
           continue;
         } else if (ringDistance < 6) {
           collisionRadius = 2;
@@ -216,6 +228,15 @@ export class GameEngine {
     }
     
     this.stop();
+  }
+
+  private awardHoopBonus(): void {
+    const bonusPoints = 100 + (this.gameState.hoopsPassed * 25); // Increasing bonus
+    this.gameState.score += bonusPoints;
+    this.gameState.hoopsPassed += 1;
+    this.gameState.lastHoopBonus = bonusPoints;
+    
+    console.log(`🎯 Hoop passed! +${bonusPoints} points (Total hoops: ${this.gameState.hoopsPassed})`);
   }
 
   private updateCamera(): void {
@@ -271,6 +292,14 @@ export class GameEngine {
 
   public getScore(): number {
     return Math.floor(this.gameState.score);
+  }
+
+  public getHoopsPassed(): number {
+    return this.gameState.hoopsPassed;
+  }
+
+  public getLastHoopBonus(): number {
+    return this.gameState.lastHoopBonus;
   }
 
   public dispose(): void {

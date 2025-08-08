@@ -163,7 +163,7 @@ export class Environment {
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.castShadow = true;
         obstacleGroup.add(ring);
-        obstacleGroup.userData = { type: 'ring', isMoving: false };
+        obstacleGroup.userData = { type: 'ring', isMoving: false, passed: false };
         break;
         
       case 2: // Building

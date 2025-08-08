@@ -22,6 +22,9 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
   const [showPlaneSelector, setShowPlaneSelector] = useState(false);
   const [selectedPlaneId, setSelectedPlaneId] = useState('basic-white');
   const [gameScore, setGameScore] = useState(0);
+  const [hoopsPassed, setHoopsPassed] = useState(0);
+  const [lastHoopBonus, setLastHoopBonus] = useState(0);
+  const [showHoopBonus, setShowHoopBonus] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState('');
   const [gameConfig, setGameConfig] = useState<GameConfig>({
@@ -39,16 +42,31 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
       setIsGameOver(true);
       setGameOverMessage(gameState.collisionMessage || 'Game Over!');
       setGameScore(gameState.score);
+      setHoopsPassed(gameState.hoopsPassed);
       setIsGameRunning(false);
     });
     
     // Start the game automatically
     startGame();
 
-    // Update score periodically
+    // Update score and hoops periodically
     const scoreInterval = setInterval(() => {
       if (gameEngineRef.current && !gameEngineRef.current.isGameOver()) {
-        setGameScore(gameEngineRef.current.getScore());
+        const currentScore = gameEngineRef.current.getScore();
+        const currentHoops = gameEngineRef.current.getHoopsPassed();
+        const currentBonus = gameEngineRef.current.getLastHoopBonus();
+        
+        setGameScore(currentScore);
+        
+        // Check for new hoop bonus
+        if (currentHoops > hoopsPassed) {
+          setHoopsPassed(currentHoops);
+          setLastHoopBonus(currentBonus);
+          setShowHoopBonus(true);
+          
+          // Hide bonus after 2 seconds
+          setTimeout(() => setShowHoopBonus(false), 2000);
+        }
       }
     }, 100);
 
@@ -68,6 +86,9 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
         setIsGameOver(false);
         setGameOverMessage('');
         setGameScore(0);
+        setHoopsPassed(0);
+        setLastHoopBonus(0);
+        setShowHoopBonus(false);
       } else if (!isGameRunning) {
         // Start new game
         gameEngineRef.current.start();
@@ -139,6 +160,11 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
             <span className="score-label">Score:</span>
             <span className="score-value">{gameScore}</span>
           </div>
+          
+          <div className="hoops-display">
+            <span className="hoops-label">Hoops:</span>
+            <span className="hoops-value">{hoopsPassed}</span>
+          </div>
         </div>
         
         <div className="game-config">
@@ -199,12 +225,23 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
         </div>
       </div>
       
+      {showHoopBonus && (
+        <div className="hoop-bonus-notification">
+          <div className="hoop-bonus-content">
+            <span className="hoop-bonus-icon">🎯</span>
+            <span className="hoop-bonus-text">HOOP PASSED!</span>
+            <span className="hoop-bonus-points">+{lastHoopBonus} points</span>
+          </div>
+        </div>
+      )}
+      
       {isGameOver && (
         <div className="game-over-overlay">
           <div className="game-over-panel">
             <h2>Game Over!</h2>
             <p className="game-over-message">{gameOverMessage}</p>
             <p className="final-score">Final Score: {gameScore}</p>
+            <p className="final-hoops">Hoops Passed: {hoopsPassed}</p>
             <button 
               onClick={startGame}
               className="control-button restart"
