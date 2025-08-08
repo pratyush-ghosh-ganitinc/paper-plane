@@ -223,6 +223,9 @@ export class GameEngine {
     this.gameState.isRunning = false;
     this.gameState.collisionMessage = message;
     
+    // Unlock the cursor when game ends
+    this.inputController.releaseLock();
+    
     if (this.onGameOver) {
       this.onGameOver(this.gameState);
     }
