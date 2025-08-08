@@ -92,7 +92,7 @@ export class PaperPlane {
   public updateRotation(deltaX: number, deltaY: number): void {
     // Update target rotation based on mouse input
     this.targetRotation.y -= deltaX; // Yaw (left/right) - inverted so right mouse = right turn
-    this.targetRotation.x += deltaY; // Pitch (up/down)
+    this.targetRotation.x -= deltaY; // Pitch (up/down) - inverted so up mouse = pitch up
     
     // Clamp pitch to prevent over-rotation
     this.targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, this.targetRotation.x));
