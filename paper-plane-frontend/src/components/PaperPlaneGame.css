@@ -1,0 +1,242 @@
+.paper-plane-game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.game-canvas {
+  display: block;
+  cursor: none;
+  background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 100%);
+}
+
+.game-ui {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  pointer-events: auto;
+  font-family: 'Arial', sans-serif;
+}
+
+.game-controls {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.control-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.control-button.start {
+  background: #4CAF50;
+  color: white;
+}
+
+.control-button.start:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.control-button.stop {
+  background: #f44336;
+  color: white;
+}
+
+.control-button.stop:hover {
+  background: #da190b;
+  transform: translateY(-2px);
+}
+
+.control-button.plane-select {
+  background: #2196F3;
+  color: white;
+}
+
+.control-button.plane-select:hover {
+  background: #1976D2;
+  transform: translateY(-2px);
+}
+
+.game-config {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+  min-width: 250px;
+}
+
+.config-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.config-group:last-child {
+  margin-bottom: 0;
+}
+
+.config-group label {
+  font-weight: bold;
+  min-width: 80px;
+  font-size: 14px;
+}
+
+.config-group input[type="range"] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.config-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.config-group input[type="range"]::-webkit-slider-thumb:hover {
+  background: #45a049;
+}
+
+.config-group span {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.game-instructions {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 300px;
+}
+
+.game-instructions h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  color: #4CAF50;
+}
+
+.game-instructions ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.game-instructions li {
+  margin-bottom: 8px;
+}
+
+.game-instructions li:last-child {
+  margin-bottom: 0;
+}
+
+.current-plane-info {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-plane-info h4 {
+  margin: 0 0 5px 0;
+  color: #4CAF50;
+  font-size: 14px;
+}
+
+.current-plane-info p {
+  margin: 0;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .game-ui {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  
+  .game-config,
+  .game-instructions {
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .config-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
+  
+  .config-group label {
+    min-width: auto;
+  }
+}
+
+/* Loading state */
+.game-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* Performance indicators */
+.performance-stats {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 10px;
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.performance-stats div {
+  margin-bottom: 5px;
+}
+
+.performance-stats div:last-child {
+  margin-bottom: 0;
+}
