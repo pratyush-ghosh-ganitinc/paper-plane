@@ -21,8 +21,11 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
   const [isGameRunning, setIsGameRunning] = useState(false);
   const [showPlaneSelector, setShowPlaneSelector] = useState(false);
   const [selectedPlaneId, setSelectedPlaneId] = useState('basic-white');
+  const [gameScore, setGameScore] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [gameOverMessage, setGameOverMessage] = useState('');
   const [gameConfig, setGameConfig] = useState<GameConfig>({
-    planeSpeed: 0.05,
+    planeSpeed: 0.15,  // Increased default speed
     sensitivity: 0.002,
     fieldOfView: 75,
     renderDistance: 1000
@@ -31,13 +34,26 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Initialize game engine
-    gameEngineRef.current = new GameEngine(canvasRef.current);
+    // Initialize game engine with game over callback
+    gameEngineRef.current = new GameEngine(canvasRef.current, (gameState) => {
+      setIsGameOver(true);
+      setGameOverMessage(gameState.collisionMessage || 'Game Over!');
+      setGameScore(gameState.score);
+      setIsGameRunning(false);
+    });
     
     // Start the game automatically
     startGame();
 
+    // Update score periodically
+    const scoreInterval = setInterval(() => {
+      if (gameEngineRef.current && !gameEngineRef.current.isGameOver()) {
+        setGameScore(gameEngineRef.current.getScore());
+      }
+    }, 100);
+
     return () => {
+      clearInterval(scoreInterval);
       if (gameEngineRef.current) {
         gameEngineRef.current.dispose();
       }
@@ -45,8 +61,17 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
   }, []);
 
   const startGame = () => {
-    if (gameEngineRef.current && !isGameRunning) {
-      gameEngineRef.current.start();
+    if (gameEngineRef.current) {
+      if (isGameOver) {
+        // Restart the game
+        gameEngineRef.current.restart();
+        setIsGameOver(false);
+        setGameOverMessage('');
+        setGameScore(0);
+      } else if (!isGameRunning) {
+        // Start new game
+        gameEngineRef.current.start();
+      }
       setIsGameRunning(true);
       onGameStart?.();
     }
@@ -97,17 +122,23 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
         <div className="game-controls">
           <button 
             onClick={isGameRunning ? stopGame : startGame}
-            className={`control-button ${isGameRunning ? 'stop' : 'start'}`}
+            className={`control-button ${isGameRunning ? 'stop' : (isGameOver ? 'restart' : 'start')}`}
           >
-            {isGameRunning ? 'Pause' : 'Start'}
+            {isGameRunning ? 'Pause' : (isGameOver ? 'Restart' : 'Start')}
           </button>
           
           <button 
             onClick={() => setShowPlaneSelector(true)}
             className="control-button plane-select"
+            disabled={isGameRunning}
           >
             Select Plane
           </button>
+          
+          <div className="score-display">
+            <span className="score-label">Score:</span>
+            <span className="score-value">{gameScore}</span>
+          </div>
         </div>
         
         <div className="game-config">
@@ -115,8 +146,8 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
             <label>Speed:</label>
             <input
               type="range"
-              min="0.01"
-              max="0.1"
+              min="0.05"
+              max="0.3"
               step="0.01"
               value={gameConfig.planeSpeed}
               onChange={(e) => updateGameConfig({ planeSpeed: parseFloat(e.target.value) })}
@@ -167,6 +198,22 @@ export const PaperPlaneGame: React.FC<PaperPlaneGameProps> = ({
           </div>
         </div>
       </div>
+      
+      {isGameOver && (
+        <div className="game-over-overlay">
+          <div className="game-over-panel">
+            <h2>Game Over!</h2>
+            <p className="game-over-message">{gameOverMessage}</p>
+            <p className="final-score">Final Score: {gameScore}</p>
+            <button 
+              onClick={startGame}
+              className="control-button restart"
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      )}
       
       <PlaneSelector
         planes={planeDatabase.current.getUnlockedPlanes()}

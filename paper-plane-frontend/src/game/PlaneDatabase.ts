@@ -30,7 +30,7 @@ export class PaperPlaneDatabase implements PlaneDatabase {
         turnRate: 2.0
       },
       gameSettings: {
-        planeSpeed: 0.05,
+        planeSpeed: 0.15,  // Increased from 0.05
         sensitivity: 0.002
       },
       description: 'The traditional white paper plane. Simple and reliable.',
@@ -47,7 +47,7 @@ export class PaperPlaneDatabase implements PlaneDatabase {
         turnRate: 3.0
       },
       gameSettings: {
-        planeSpeed: 0.08,
+        planeSpeed: 0.22,  // Increased for speed variant
         sensitivity: 0.003
       },
       description: 'A faster blue plane with enhanced maneuverability.',

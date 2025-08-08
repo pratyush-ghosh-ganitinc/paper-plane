@@ -125,11 +125,17 @@ export class Environment {
       const obstacle = this.createObstacle();
       
       // Position obstacles in a scattered pattern ahead of the starting position
-      obstacle.position.set(
+      const position = new THREE.Vector3(
         (Math.random() - 0.5) * 200,
         Math.random() * 40 + 5,
         -Math.random() * 300 - 50
       );
+      obstacle.position.copy(position);
+      
+      // Store original position for moving obstacles
+      if (obstacle.userData.isMoving) {
+        obstacle.userData.originalPosition.copy(position);
+      }
       
       this.obstacles.push(obstacle);
     }
@@ -139,7 +145,7 @@ export class Environment {
     const obstacleGroup = new THREE.Group();
     
     // Random obstacle type
-    const type = Math.floor(Math.random() * 3);
+    const type = Math.floor(Math.random() * 4); // Increased to 4 for moving obstacles
     
     switch (type) {
       case 0: // Tower
@@ -148,6 +154,7 @@ export class Environment {
         const tower = new THREE.Mesh(towerGeometry, towerMaterial);
         tower.castShadow = true;
         obstacleGroup.add(tower);
+        obstacleGroup.userData = { type: 'tower', isMoving: false };
         break;
         
       case 1: // Ring
@@ -156,6 +163,7 @@ export class Environment {
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.castShadow = true;
         obstacleGroup.add(ring);
+        obstacleGroup.userData = { type: 'ring', isMoving: false };
         break;
         
       case 2: // Building
@@ -164,6 +172,28 @@ export class Environment {
         const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
         building.castShadow = true;
         obstacleGroup.add(building);
+        obstacleGroup.userData = { type: 'building', isMoving: false };
+        break;
+        
+      case 3: // Moving Platform
+        const platformGeometry = new THREE.BoxGeometry(8, 2, 8);
+        const platformMaterial = new THREE.MeshLambertMaterial({ color: 0xff4444 });
+        const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+        platform.castShadow = true;
+        obstacleGroup.add(platform);
+        obstacleGroup.userData = { 
+          type: 'platform', 
+          isMoving: true,
+          moveDirection: new THREE.Vector3(
+            (Math.random() - 0.5) * 2,
+            (Math.random() - 0.5) * 0.5,
+            (Math.random() - 0.5) * 2
+          ).normalize(),
+          moveSpeed: 5 + Math.random() * 10,
+          moveRadius: 20 + Math.random() * 30,
+          originalPosition: new THREE.Vector3(),
+          moveTime: 0
+        };
         break;
     }
     
@@ -192,6 +222,25 @@ export class Environment {
       }
     });
     
+    // Animate moving obstacles
+    this.obstacles.forEach(obstacle => {
+      if (obstacle.userData.isMoving) {
+        obstacle.userData.moveTime += deltaTime;
+        
+        const { moveDirection, moveSpeed, moveRadius, originalPosition } = obstacle.userData;
+        
+        // Create oscillating movement pattern
+        const offset = new THREE.Vector3()
+          .copy(moveDirection)
+          .multiplyScalar(Math.sin(obstacle.userData.moveTime * moveSpeed) * moveRadius);
+        
+        obstacle.position.copy(originalPosition).add(offset);
+        
+        // Add some rotation for visual interest
+        obstacle.rotation.y += deltaTime * 0.5;
+      }
+    });
+    
     // Generate new obstacles ahead of the plane
     this.manageObstacles(planePosition);
   }
@@ -209,16 +258,31 @@ export class Environment {
     // Add new obstacles ahead if needed
     if (this.obstacles.length < 10) {
       const obstacle = this.createObstacle();
-      obstacle.position.set(
+      const position = new THREE.Vector3(
         (Math.random() - 0.5) * 200,
         Math.random() * 40 + 5,
         planePosition.z - Math.random() * 200 - 100
       );
+      obstacle.position.copy(position);
+      
+      // Store original position for moving obstacles
+      if (obstacle.userData.isMoving) {
+        obstacle.userData.originalPosition.copy(position);
+      }
+      
       this.obstacles.push(obstacle);
       
       // Add to scene (assuming we have access to it)
       // This would need to be handled by the GameEngine
     }
+  }
+
+  public resetObstacles(): void {
+    // Clear existing obstacles
+    this.obstacles = [];
+    
+    // Regenerate obstacles
+    this.generateObstacles();
   }
 
   public getObstacles(): THREE.Group[] {
